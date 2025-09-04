@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fetch from 'node-fetch';
-import { adminAuth, adminDb } from '../lib/firebase/admin';
+import { adminAuth, adminDb } from '@/lib/firebase/admin';
 
 // Test configuration
 const UAT_CONFIG = {

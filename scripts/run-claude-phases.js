@@ -244,7 +244,7 @@ class QAAgent {
 
     // Step 1: Generate unit tests
     console.log('\n🔍 Step 1: Analyzing lib/ai/tools for test generation...');
-    const toolsPath = path.resolve(__dirname, '../lib/ai/tools');
+    const toolsPath = path.resolve(__dirname, '../src/lib/ai/tools');
     const testTargets = [];
 
     if (fs.existsSync(toolsPath)) {

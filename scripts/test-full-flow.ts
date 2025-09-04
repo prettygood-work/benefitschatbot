@@ -4,8 +4,8 @@ import path from 'node:path';
 // Load environment variables BEFORE any other imports
 config({ path: path.resolve(process.cwd(), '.env.local') });
 
-import { db } from '../lib/db';
-import { companies, knowledgeBaseDocuments } from '../lib/db/schema';
+import { db } from '@/lib/db';
+import { companies, knowledgeBaseDocuments } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 async function testFullDocumentFlow() {
@@ -40,7 +40,7 @@ async function testFullDocumentFlow() {
     
     // 3. Check Pinecone connection
     console.log('3️⃣ Testing Pinecone Connection...');
-    const { getCompanyNamespace } = await import('../lib/vectors/pinecone');
+    const { getCompanyNamespace } = await import('@/lib/vectors/pinecone');
     const namespace = getCompanyNamespace(testCompany.id);
     const stats = await namespace.describeIndexStats();
     console.log('✅ Pinecone connected successfully');
@@ -73,14 +73,14 @@ async function testFullDocumentFlow() {
     
     All plans include prescription coverage and access to our extensive provider network.`;
     
-    const { chunkText } = await import('../lib/documents/processor');
+    const { chunkText } = await import('@/lib/documents/processor');
     const chunks = chunkText(testText, { maxChunkSize: 500, overlapSize: 100 });
     console.log(`✅ Text chunked successfully: ${chunks.length} chunks created`);
     console.log(`   Average chunk size: ${Math.round(chunks.reduce((acc, c) => acc + c.length, 0) / chunks.length)} characters\n`);
     
     // 5. Test embedding generation
     console.log('5️⃣ Testing Embedding Generation...');
-    const { generateEmbedding } = await import('../lib/ai/embeddings');
+    const { generateEmbedding } = await import('@/lib/ai/embeddings');
     const sampleEmbedding = await generateEmbedding('TechCorp offers comprehensive health benefits');
     console.log('✅ Embedding generated successfully');
     console.log(`   Dimensions: ${sampleEmbedding.length}`);

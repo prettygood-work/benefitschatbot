@@ -3,7 +3,7 @@ async function setupDevelopmentEnvironment() {
   const isDevelopment = process.env.NODE_ENV === 'development';
   if (isDevelopment) {
     // Use a dynamic import for the JavaScript file
-    const { FIREBASE_EMULATOR_CONFIG } = await import('./lib/config/env.local.js');
+    const { FIREBASE_EMULATOR_CONFIG } = await import('./src/lib/config/env.local.js');
     const { projectId, host, ports } = FIREBASE_EMULATOR_CONFIG;
     
     process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = projectId;

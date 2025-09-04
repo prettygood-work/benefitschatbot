@@ -1,7 +1,7 @@
-import { codeDocumentHandler } from '@/artifacts/code/server';
-import { imageDocumentHandler } from '@/artifacts/image/server';
-import { sheetDocumentHandler } from '@/artifacts/sheet/server';
-import { textDocumentHandler } from '@/artifacts/text/server';
+import { codeDocumentHandler } from '../../artifacts/code/server';
+import { imageDocumentHandler } from '../../artifacts/image/server';
+import { sheetDocumentHandler } from '../../artifacts/sheet/server';
+import { textDocumentHandler } from '../../artifacts/text/server';
 import type { ArtifactKind } from '@/components/artifact';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';

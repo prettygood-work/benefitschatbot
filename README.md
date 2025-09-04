@@ -42,8 +42,6 @@ A multi-tenant, AI-powered benefits management platform that transforms employee
 - **[Product Blueprint](./docs/blueprint-v2.md)** - Vision, personas, and non-functional requirements
 - **[Style Guide](./docs/style-guide-v2.md)** - Design system and UI standards
 - **[Development Roadmap](./docs/roadmap-v2.md)** - 18-week phased implementation plan
-- **[Claude Code Execution System](./docs/claude-code-execution-system.md)** - Step-by-step implementation guide
-- **[Development Control System](./claude.md)** - Real-time development tracking and verification
 
 ## 🏗️ Architecture Overview
 
@@ -194,29 +192,19 @@ vercel ls
 
 ```
 benefits-chatbot/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── (chat)/            # Chat interface
-│   ├── api/               # API routes
-│   └── provider/          # Provider admin portal
-├── components/            # React components
-│   ├── custom/            # Business-specific components
-│   └── ui/                # shadcn/ui components
-├── lib/                   # Core business logic
-│   ├── ai/                # AI tools and prompts
-│   │   ├── tools/         # AI function tools
-│   │   ├── prompts/       # System prompts
-│   │   └── context/       # Context management
-│   ├── db/                # Database layer
-│   │   ├── schema/        # Drizzle schemas
-│   │   ├── repositories/  # Data access layer
-│   │   └── migrations/    # SQL migrations
-│   └── utils/             # Utility functions
-├── public/                # Static assets
-├── scripts/               # Build and maintenance scripts
-├── tests/                 # Test files
-├── docs/                  # Documentation
-└── claude.md              # Development tracking
+├── src/                 # Application sources
+│   ├── app/            # Next.js App Router
+│   ├── components/     # React components
+│   ├── config/         # Configuration modules
+│   ├── context/        # React context providers
+│   ├── dataconnect/    # Data connectors
+│   ├── hooks/          # Custom hooks
+│   ├── lib/            # Core business logic
+│   └── types/          # Type definitions
+├── public/             # Static assets
+├── scripts/            # Build and maintenance scripts
+├── tests/              # Test files
+└── docs/               # Documentation
 ```
 
 ## 🔐 Security
@@ -241,11 +229,9 @@ benefits-chatbot/
 ## 🤝 Contributing
 
 ### Development Workflow
-1. Review [claude.md](./claude.md) for current status
 2. Pick a task from the roadmap
 3. Create a feature branch
 4. Implement with proof-of-work
-5. Update claude.md with evidence
 6. Submit PR with verification
 
 ### Code Standards
@@ -256,10 +242,8 @@ benefits-chatbot/
 
 ### Using with Windsurf/Cascade
 When using AI coding assistants:
-1. Always provide full context from claude.md
 2. Verify generated code against our patterns
 3. Run verification suite before committing
-4. Document any deviations in claude.md
 
 ## 📊 Monitoring & Analytics
 
@@ -320,4 +304,4 @@ Proprietary - All rights reserved
 
 ---
 
-**Note**: This is an active development project. Always check [claude.md](./claude.md) for the latest development status and [roadmap-v2.md](./docs/roadmap-v2.md) for upcoming features.
+**Note**: This is an active development project. Always check [roadmap-v2.md](./docs/roadmap-v2.md) for upcoming features.

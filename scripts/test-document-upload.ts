@@ -4,12 +4,12 @@ import path from 'node:path';
 // Load environment variables BEFORE any other imports
 config({ path: path.resolve(process.cwd(), '.env.local') });
 
-import { db } from '../lib/db';
-import { knowledgeBaseDocuments } from '../lib/db/schema';
+import { db } from '@/lib/db';
+import { knowledgeBaseDocuments } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { IndexEndpointServiceClient } from '@google-cloud/aiplatform';
 import { GoogleAuth } from 'google-auth-library';
-import { upsertDocumentChunks } from '../lib/ai/vector-search';
+import { upsertDocumentChunks } from '@/lib/ai/vector-search';
 
 async function testDocumentProcessing() {
   console.log('🧪 Testing Document Processing Pipeline with Vertex AI');
@@ -47,7 +47,7 @@ async function testDocumentProcessing() {
     Section 3: Vision Coverage
     Vision benefits include annual eye exams and allowances for glasses or contact lenses. The plan provides $150 annually for frames.`;
     
-    const { chunkText } = await import('../lib/documents/processor');
+    const { chunkText } = await import('@/lib/documents/processor');
     const chunks = chunkText(testText, { maxChunkSize: 200, overlapSize: 50 });
     console.log(`✅ Text chunked successfully: ${chunks.length} chunks created`);
     console.log(`   Sample chunk: "${chunks[0].substring(0, 100)}..."\n`);

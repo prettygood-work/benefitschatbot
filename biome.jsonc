@@ -3,9 +3,15 @@
   "files": {
     "ignoreUnknown": false,
     "ignore": [
+      "functions",
+      "scripts",
+      ".claude",
+      ".idx",
+      ".vscode",
+      "docs/**/*.json",
       "**/pnpm-lock.yaml",
-      "lib/db/migrations",
-      "lib/editor/react-renderer.tsx",
+      "src/lib/db/migrations",
+      "src/lib/editor/react-renderer.tsx",
       "node_modules",
       ".next",
       "public",

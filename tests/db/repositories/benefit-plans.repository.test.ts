@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { BenefitPlansRepository } from '../../../lib/db/repositories/benefit-plans.repository';
-import { companies, users, benefitPlans, benefitEnrollments } from '../../../lib/db/schema';
+import { BenefitPlansRepository } from '@/lib/db/repositories/benefit-plans.repository';
+import { companies, users, benefitPlans, benefitEnrollments } from '@/lib/db/schema';
 
 /**
  * Integration tests for BenefitPlansRepository
