@@ -27,6 +27,11 @@ vi.mock('firebase/auth', () => ({
   signInWithEmailAndPassword: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
   signOut: vi.fn(),
+  sendPasswordResetEmail: vi.fn(),
+  onIdTokenChanged: vi.fn((auth, callback) => {
+    callback(null);
+    return () => {};
+  }),
   onAuthStateChanged: vi.fn((auth, callback) => {
     callback(null);
     return () => {};
@@ -54,7 +59,7 @@ describe('AuthForm', () => {
       </AuthProvider>
     );
     
-    expect(screen.getByLabelText('Email Address')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
   });
 });
