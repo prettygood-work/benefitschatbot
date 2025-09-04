@@ -31,6 +31,11 @@ vi.mock('firebase/auth', () => ({
     callback(null);
     return () => {};
   }),
+  sendPasswordResetEmail: vi.fn(),
+  onIdTokenChanged: vi.fn((auth, callback) => {
+    callback(null);
+    return () => {};
+  }),
 }));
 
 vi.mock('firebase/firestore', () => ({
@@ -47,14 +52,14 @@ vi.mock('firebase/firestore', () => ({
 describe('AuthForm', () => {
   it('renders email and password fields', () => {
     const mockSetMfaResolver = vi.fn();
-    
+
     render(
       <AuthProvider>
         <AuthForm setMfaResolver={mockSetMfaResolver} />
-      </AuthProvider>
+      </AuthProvider>,
     );
-    
-    expect(screen.getByLabelText('Email Address')).toBeInTheDocument();
+
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
   });
 });
