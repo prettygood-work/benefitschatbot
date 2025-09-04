@@ -1,4 +1,5 @@
-import { adminDb, FieldValue as AdminFieldValue, Timestamp as AdminTimestamp } from '@/lib/firebase/admin';
+import { adminDb, FieldValue as AdminFieldValue } from '@/lib/firebase/admin';
+import { Timestamp as AdminTimestamp } from 'firebase-admin/firestore';
 import type { RateLimiter, RateLimitResult } from './index';
 
 /**

@@ -27,6 +27,7 @@ export interface FirebaseUser {
   photoURL?: string | null;
   department?: string;
   hireDate?: string;
+  companyId?: string;
   role: UserRole;
   createdAt: any;
   updatedAt: any;
@@ -164,6 +165,24 @@ export class UserService {
       return snapshot.docs.map(doc => doc.data() as FirebaseUser);
     } catch (error) {
       console.error('Failed to list users:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Assign a user to a company
+   */
+  async assignUserToCompany(uid: string, companyId: string): Promise<void> {
+    try {
+      await adminDb.collection('users').doc(uid).set(
+        {
+          companyId,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error(`Failed to assign user ${uid} to company ${companyId}:`, error);
       throw error;
     }
   }

@@ -19,7 +19,7 @@ class VectorSearchService {
     this.indexEndpointClient = new IndexEndpointServiceClient(clientOptions);
   }
 
-  async upsertChunks(chunks: { id: string; embedding: number[] }[]) {
+  async upsertChunks(chunks: any[]) {
     const datapoints = chunks.map(chunk => ({
       datapoint_id: chunk.id,
       feature_vector: chunk.embedding,
@@ -32,7 +32,7 @@ class VectorSearchService {
 
     try {
       console.log('Upserting datapoints to Vertex AI Vector Search...');
-      await this.indexClient.upsertDatapoints(request);
+      await (this.indexClient as any).upsertDatapoints(request as any);
       console.log('Successfully upserted datapoints.');
     } catch (error) {
       console.error('Error upserting datapoints to Vertex AI:', error);
@@ -54,7 +54,7 @@ class VectorSearchService {
     };
 
     try {
-      const [response] = await this.indexEndpointClient.findNeighbors(request);
+      const [response] = await (this.indexEndpointClient as any).findNeighbors(request as any);
       if (response.nearestNeighbors && response.nearestNeighbors.length > 0) {
         return response.nearestNeighbors[0].neighbors;
       }

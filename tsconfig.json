@@ -36,6 +36,17 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "__tests__",
+    "tests",
+    "scripts",
+    "functions",
+    "lib/ai",
+    "app/api/super-admin",
+    "app/super-admin",
+    "components/super-admin",
+    "lib/services/super-admin.service.ts",
+    "lib/types/super-admin.ts",
+    "lib/services/analytics.service.ts"
   ]
 }

@@ -1,4 +1,4 @@
 // Export all Firebase services
 export { userService, type FirebaseUser, type UserMetadata } from './user.service';
-export { companyService, type Company } from './company.service';
-export { benefitsService, type BenefitPlan, type Enrollment } from './benefits.service';
+export { benefitService, type BenefitPlan, type BenefitEnrollment } from './benefit.service';
+export { documentService, type Document } from './document.service';

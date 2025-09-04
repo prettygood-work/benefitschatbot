@@ -9,25 +9,26 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  type User, 
-  onIdTokenChanged, 
+  type User,
+  onIdTokenChanged,
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  type UserCredential
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithEmail: typeof signInWithEmailAndPassword;
+  signInWithEmail: (email: string, password: string) => Promise<UserCredential>;
   signInWithGoogle: () => Promise<void>;
-  createUser: typeof createUserWithEmailAndPassword;
-  sendPasswordReset: typeof sendPasswordResetEmail;
-  signOut: typeof firebaseSignOut;
+  createUser: (email: string, password: string) => Promise<UserCredential>;
+  sendPasswordReset: (email: string, actionCodeSettings?: Parameters<typeof sendPasswordResetEmail>[2]) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,14 +70,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/login');
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     loading,
-    signInWithEmail: signInWithEmailAndPassword.bind(null, auth),
+    signInWithEmail: (email, password) => signInWithEmailAndPassword(auth, email, password),
     signInWithGoogle,
-    createUser: createUserWithEmailAndPassword.bind(null, auth),
-    sendPasswordReset: sendPasswordResetEmail.bind(null, auth),
-    signOut
+    createUser: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+    sendPasswordReset: (email, actionCodeSettings) => sendPasswordResetEmail(auth, email, actionCodeSettings),
+    signOut: () => firebaseSignOut(auth)
   };
 
   return (

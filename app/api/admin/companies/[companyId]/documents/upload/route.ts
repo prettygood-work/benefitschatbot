@@ -57,7 +57,7 @@ export const POST = withAuth(USER_ROLES.COMPANY_ADMIN, async (
     });
     
     // Create database record
-    const documentId = await documentService.createDocument(companyId, {
+    const documentId = await documentService.createDocument({
       ...parsedMetadata,
       fileUrl: uploadResult.url,
       fileType: file.type,
@@ -95,7 +95,7 @@ export const GET = withAuth(USER_ROLES.COMPANY_ADMIN, async (
   try {
     const { companyId } = params;
     
-    const documents = await documentService.listDocuments(companyId);
+    const documents = await documentService.listDocuments();
     
     return NextResponse.json({
       documents: documents.map(doc => ({

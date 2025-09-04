@@ -16,7 +16,7 @@ export const POST = withAuth(USER_ROLES.EMPLOYEE, async (
 
     // TODO: Verify the plan exists and belongs to user's company
 
-    const enrollmentId = await benefitService.enrollInBenefitPlan(user.uid, user.companyId, validated);
+    const enrollmentId = await benefitService.enrollInBenefitPlan(user.uid, validated);
 
     return NextResponse.json({
       success: true,

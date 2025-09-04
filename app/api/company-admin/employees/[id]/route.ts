@@ -42,14 +42,6 @@ export const PATCH = requireCompanyAdmin(async (
       return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
     }
 
-    // Prevent downgrading own permissions
-    if (params.id === user.uid && validated.userType && validated.userType !== user.role) {
-      return NextResponse.json(
-        { error: 'Cannot change your own role' },
-        { status: 400 }
-      );
-    }
-
     await userService.updateUserMetadata(params.id, validated);
 
     return NextResponse.json({ success: true });

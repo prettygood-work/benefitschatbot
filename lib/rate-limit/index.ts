@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { RATE_LIMITS } from '@/lib/config';
 import { FirestoreRateLimiter, InMemoryRateLimiter } from './firestore-limiter';
 import { adminAuth } from '../firebase/admin';
 
@@ -43,6 +42,11 @@ function getRateLimiter(): RateLimiter {
   // Use in-memory rate limiter for development
   return new InMemoryRateLimiter();
 }
+
+// Default rate limit configuration
+const RATE_LIMITS: Record<string, { max: number; windowMs: number }> = {
+  default: { max: 100, windowMs: 60_000 },
+};
 
 // Singleton rate limiter instance
 const rateLimiter = getRateLimiter();

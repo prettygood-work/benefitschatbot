@@ -1,7 +1,11 @@
 
 import { db } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import type { BenefitPlan } from '@/lib/types/benefit';
+
+export interface BenefitPlan {
+  id: string;
+  [key: string]: any;
+}
 
 class BenefitService {
   private benefitPlansCollection = db.collection('benefitPlans');

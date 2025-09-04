@@ -91,6 +91,18 @@ export class DocumentService {
       throw error;
     }
   }
+
+  /**
+   * Delete a document by ID from the top-level 'documents' collection
+   */
+  async deleteDocument(documentId: string): Promise<void> {
+    try {
+      await this.documentCollection.doc(documentId).delete();
+    } catch (error) {
+      console.error(`Failed to delete document ${documentId}:`, error);
+      throw error;
+    }
+  }
 }
 
 // Export singleton instance

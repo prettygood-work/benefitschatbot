@@ -53,7 +53,7 @@ export const compareBenefitsPlans = tool({
       }
 
       // Get the specified benefit plans for comparison
-      const allPlans = await benefitService.getBenefitPlans(user.companyId);
+      const allPlans = await benefitService.getBenefitPlans();
       const plans = allPlans.filter(p => planIds.includes(p.id));
 
       if (plans.length === 0) {

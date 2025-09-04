@@ -25,7 +25,6 @@ export const GET = requireCompanyAdmin(async (
     const offset = (page - 1) * limit;
 
     const employees = await userService.listUsers({
-      companyId: user.companyId,
       limit,
     });
 

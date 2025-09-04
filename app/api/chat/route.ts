@@ -36,7 +36,19 @@ export async function POST(request: NextRequest) {
       model: google('gemini-1.5-flash-latest'),
       system: CHAT_SYSTEM_PROMPT,
       messages,
-      async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
+      async onFinish({
+        text,
+        toolCalls,
+        toolResults,
+        usage,
+        finishReason,
+      }: {
+        text: string;
+        toolCalls?: unknown;
+        toolResults?: unknown;
+        usage?: unknown;
+        finishReason?: string;
+      }) {
         // Save assistant message to Firestore
         const assistantMessageRef = adminDb
           .doc(`companies/${companyId}/conversations/${chatId}/messages/ai-message-${Date.now()}`);
