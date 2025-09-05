@@ -60,7 +60,7 @@ class RAGSystem {
   async search(
     query: string, 
     companyId: string, 
-    limit: number = 5
+    limit = 5
   ): Promise<SearchResult[]> {
     try {
       const queryEmbedding = await generateEmbedding(query);
@@ -72,30 +72,40 @@ class RAGSystem {
   }
 
   private async vectorSearch(
-    queryEmbedding: number[], 
-    companyId: string, 
+    queryEmbedding: number[],
+    companyId: string,
     limit: number
   ): Promise<SearchResult[]> {
-    const neighbors = await vectorSearchService.findNearestNeighbors(queryEmbedding, limit);
+    const neighbors = await vectorSearchService.findNearestNeighbors(
+      queryEmbedding,
+      limit,
+      companyId,
+    );
     if (!neighbors || neighbors.length === 0) {
       return [];
     }
-  
-    const chunkIds = neighbors.map(n => n.datapoint.datapointId);
-    
-    // Fetch chunk content from Firestore based on IDs from vector search
-    const chunkDocs = await adminDb.collection('document_chunks').where('id', 'in', chunkIds).get();
-    
+
+    const chunkIds = neighbors.map((n) => n.datapoint.datapointId);
+
+    // Fetch chunk content from Firestore scoped to company
+    const chunkDocs = await adminDb
+      .collection('document_chunks')
+      .where('companyId', '==', companyId)
+      .where('id', 'in', chunkIds)
+      .get();
+
     const chunksById = new Map();
-    chunkDocs.forEach(doc => chunksById.set(doc.id, doc.data()));
-    
-    return neighbors.map(neighbor => {
-      const chunk = chunksById.get(neighbor.datapoint.datapointId);
-      return {
-        chunk,
-        score: neighbor.distance, // Vertex AI returns distance, can be converted to similarity
-      };
-    }).filter(result => result.chunk && result.chunk.companyId === companyId);
+    chunkDocs.forEach((doc) => chunksById.set(doc.id, doc.data()));
+
+    return neighbors
+      .map((neighbor) => {
+        const chunk = chunksById.get(neighbor.datapoint.datapointId);
+        return {
+          chunk,
+          score: neighbor.distance, // Vertex AI returns distance, can be converted to similarity
+        };
+      })
+      .filter((result) => result.chunk && result.chunk.companyId === companyId);
   }
 
   // ... (keywordSearch, splitIntoChunks, cosineSimilarity, generateContext remain the same)

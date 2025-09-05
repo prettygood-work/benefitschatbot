@@ -120,17 +120,25 @@ class VectorSearchService {
     }
   }
 
-  async findNearestNeighbors(queryEmbedding: number[], numNeighbors = 5) {
+  async findNearestNeighbors(
+    queryEmbedding: number[],
+    numNeighbors = 5,
+    companyId?: string,
+  ) {
+    const query: any = {
+      datapoint: {
+        featureVector: queryEmbedding,
+      },
+      neighborCount: numNeighbors,
+    };
+
+    if (companyId) {
+      query.restricts = [{ namespace: 'company_id', allowTokens: [companyId] }];
+    }
+
     const request = {
       indexEndpoint: this.endpointPath,
-      queries: [
-        {
-          datapoint: {
-            featureVector: queryEmbedding,
-          },
-          neighborCount: numNeighbors,
-        },
-      ],
+      queries: [query],
     };
 
     try {
