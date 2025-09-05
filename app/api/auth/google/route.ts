@@ -1,11 +1,12 @@
 // app/api/auth/google/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { SERVER_ENV } from '@/lib/config/env.server';
 
 const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  SERVER_ENV.GOOGLE_CLIENT_ID,
+  SERVER_ENV.GOOGLE_CLIENT_SECRET,
+  SERVER_ENV.GOOGLE_REDIRECT_URI
 );
 
 export async function GET(request: NextRequest) {

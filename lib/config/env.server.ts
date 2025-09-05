@@ -16,6 +16,16 @@ const hasServiceAccount =
   serviceAccount.privateKey &&
   serviceAccount.clientEmail;
 
+export const SERVER_ENV = {
+  GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+  GCS_BUCKET_NAME: process.env.GCS_BUCKET_NAME,
+};
+
 export const FIREBASE_ADMIN_CONFIG = {
   serviceAccount: hasServiceAccount ? serviceAccount : undefined,
   // The databaseURL is often required for the Admin SDK.

@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { logger } from '@/lib/services/logger.service';
+import { config } from '@/lib/config';
+import { SERVER_ENV } from '@/lib/config/env.server';
 
 /**
  * GET /api/ready
@@ -32,13 +34,13 @@ export async function GET(req: NextRequest) {
       logger.warn('Firestore not ready', { metadata: { error: (error as Error).message } });
     }
 
-    // Check required environment variables
+    // Check required environment variables via config layer
     checks.environment = !!(
-      process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
-      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
-      (process.env.GOOGLE_GENERATIVE_AI_API_KEY || 
-       process.env.OPENAI_API_KEY || 
-       process.env.ANTHROPIC_API_KEY)
+      config.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+      config.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+      (SERVER_ENV.GOOGLE_GENERATIVE_AI_API_KEY ||
+       SERVER_ENV.OPENAI_API_KEY ||
+       SERVER_ENV.ANTHROPIC_API_KEY)
     );
 
     // All checks must pass for readiness

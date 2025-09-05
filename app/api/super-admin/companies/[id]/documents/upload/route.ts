@@ -2,9 +2,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Storage } from '@google-cloud/storage';
 import { requireSuperAdmin } from '@/lib/auth/admin-middleware';
+import { SERVER_ENV } from '@/lib/config/env.server';
 
 const storage = new Storage();
-const bucketName = process.env.GCS_BUCKET_NAME as string;
+const bucketName = SERVER_ENV.GCS_BUCKET_NAME as string;
 
 export const POST = requireSuperAdmin(async (
   request: NextRequest,

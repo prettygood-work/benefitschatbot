@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { logger } from '@/lib/services/logger.service';
 import { getConfig } from '@/config/environments';
 import { FieldValue } from 'firebase-admin/firestore';
+import { SERVER_ENV } from '@/lib/config/env.server';
 
 interface HealthCheckResult {
   service: string;
@@ -147,9 +148,9 @@ async function checkAIServices(): Promise<HealthCheckResult> {
   const start = Date.now();
   
   try {
-    const hasGoogleAI = !!process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-    const hasOpenAI = !!process.env.OPENAI_API_KEY;
-    const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
+    const hasGoogleAI = !!SERVER_ENV.GOOGLE_GENERATIVE_AI_API_KEY;
+    const hasOpenAI = !!SERVER_ENV.OPENAI_API_KEY;
+    const hasAnthropic = !!SERVER_ENV.ANTHROPIC_API_KEY;
     
     if (!hasGoogleAI && !hasOpenAI && !hasAnthropic) {
       return {

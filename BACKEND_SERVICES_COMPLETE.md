@@ -135,9 +135,9 @@ Your provided API keys are configured and ready:
 
 | Service | Status | Key (Partial) |
 |---------|--------|---------------|
-| Firebase | ✅ Active | AIzaSyDM...Vhs |
-| Gemini AI | ✅ Active | AIzaSyAm...Dkk |
-| Resend | ✅ Active | re_eNcT...Gna5 |
+| Firebase | ✅ Active | [REDACTED] |
+| Gemini AI | ✅ Active | [REDACTED] |
+| Resend | ✅ Active | [REDACTED] |
 
 ## 📈 Performance Optimizations
 
