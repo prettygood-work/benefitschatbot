@@ -83,85 +83,17 @@ A multi-tenant, AI-powered benefits management platform that transforms employee
 
 ## 🚦 Quick Start
 
-### Prerequisites
-- Node.js >= 20.0.0
-- pnpm >= 8.0.0
-- PostgreSQL (via Neon)
-- Vercel CLI (for deployment)
-
-### Environment Setup
+### Quick Start Commands
 ```bash
-# Clone repository
-git clone https://github.com/your-org/benefits-chatbot.git
-cd benefits-chatbot
-
-# Install dependencies
 pnpm install
+pnpm run dev
+firebase emulators:start
 
-# Copy environment variables
-cp .env.example .env.local
-# Never commit real `.env` files or secrets to version control.
-
-# Required environment variables:
-FIREBASE_PROJECT_ID=       # Firebase project identifier
-FIREBASE_CLIENT_EMAIL=     # Service account client email
-FIREBASE_PRIVATE_KEY=      # Base64-encoded private key
-POSTGRES_URL=              # Neon PostgreSQL URL
-POSTGRES_URL_NON_POOLING=  # Neon direct connection
-AUTH_SECRET=               # NextAuth secret (generate with: openssl rand -base64 32)
-OPENAI_API_KEY=            # For GPT-4 fallback
-XAI_API_KEY=               # For Grok-2 (primary)
-```
-
-#### Google Cloud Setup
-
-To use Vertex AI and Document AI features:
-
-1. Enable the Vertex AI and Document AI APIs in your Google Cloud project.
-2. Create a Vertex AI index and endpoint, and note their IDs.
-3. Create a Document AI processor for the documents you need to process.
-4. Grant your service account the following IAM roles:
-   - Vertex AI User (`roles/aiplatform.user`)
-   - Document AI Editor (`roles/documentai.editor`)
-5. Add the following variables to your `.env.local` file:
-   - `GOOGLE_CLOUD_PROJECT`
-   - `GOOGLE_CLOUD_LOCATION`
-   - `VERTEX_INDEX_ID`
-   - `VERTEX_ENDPOINT_ID`
-   - `DOCUMENT_AI_PROCESSOR_ID`
-
-### Development
-```bash
-# Run database migrations
-pnpm db:migrate
-
-# Start development server
-pnpm dev
-
-# Run tests
+pnpm build
+pnpm typecheck
 pnpm test
-
-# Check types
-pnpm tsc --noEmit
-
-# Lint and format
-pnpm lint:fix
+pnpm lint
 pnpm format
-```
-
-### Database Management
-```bash
-# Generate migration
-pnpm db:generate
-
-# Run migrations
-pnpm db:migrate
-
-# Open Drizzle Studio
-pnpm db:studio
-
-# Push schema changes (dev only)
-pnpm db:push
 ```
 
 ## 🧪 Testing Strategy
