@@ -94,7 +94,7 @@ class RAGSystem {
       .where('id', 'in', chunkIds)
       .get();
 
-    const chunksById = new Map();
+    const chunksById = new Map<string, any>();
     chunkDocs.forEach((doc) => chunksById.set(doc.id, doc.data()));
 
     return neighbors
