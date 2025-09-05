@@ -56,13 +56,12 @@ export async function POST(request: NextRequest) {
         chatId,
         results: searchResults.map((r) => ({
           chunkId: r.chunk.id,
-          documentId: r.chunk.documentId,
           score: r.score,
         })),
       });
     }
-    const systemPrompt = context
-      ? `Context:\n${context}\n\n${CHAT_SYSTEM_PROMPT}`
+    const systemPrompt = searchResults.length
+      ? `${CHAT_SYSTEM_PROMPT}\n\nRetrieved context:\n${context}`
       : CHAT_SYSTEM_PROMPT;
 
     // Call the Google AI model
