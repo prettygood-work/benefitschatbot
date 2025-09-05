@@ -52,6 +52,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { emailService } from '@/lib/services/email.service';
 
 interface Employee {
   id: string;
@@ -180,10 +181,23 @@ export function EmployeeList({
           `/api/company-admin/employees?companyId=${companyId}&search=${searchQuery}&role=${filterRole}&status=${filterStatus}`,
         );
       } else if (action === 'send-email') {
-        // TODO: Implement email sending
+        const employee = employees.find((e) => e.id === employeeId);
+        if (!employee) throw new Error('Employee not found');
+
+        const result = await emailService.sendNotification({
+          email: employee.email,
+          name: employee.name,
+          title: `Message from ${companyName}`,
+          message: `<p>Hello ${employee.name},</p><p>You have a new message from ${companyName}.</p>`,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to send email');
+        }
+
         toast({
-          title: 'Feature Coming Soon',
-          description: 'Email functionality will be available soon',
+          title: 'Email Sent',
+          description: `Email sent to ${employee.email}`,
         });
       }
     } catch (error) {
@@ -206,11 +220,56 @@ export function EmployeeList({
     }
 
     try {
-      // TODO: Implement bulk actions via API
-      toast({
-        title: 'Feature Coming Soon',
-        description: `Bulk ${action} will be available soon`,
+      const response = await fetch('/api/company-admin/employees/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, employeeIds: selectedEmployees }),
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || `Failed to ${action}`);
+      }
+
+      const data = await response.json();
+
+      if (action === 'export') {
+        const headers = ['Name', 'Email', 'Role', 'Department'];
+        const csvRows = [headers.join(',')];
+        data.employees.forEach((emp: any) => {
+          const row = [emp.name, emp.email, emp.role, emp.department || '']
+            .map((field) => `"${String(field).replace(/"/g, '""')}"`)
+            .join(',');
+          csvRows.push(row);
+        });
+        const blob = new Blob([csvRows.join('\n')], {
+          type: 'text/csv;charset=utf-8;',
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'employees.csv';
+        link.click();
+        URL.revokeObjectURL(url);
+        toast({
+          title: 'Export Successful',
+          description: `Exported ${data.employees.length} employees`,
+        });
+      } else if (action === 'deactivate') {
+        toast({
+          title: 'Employees Deactivated',
+          description: `Deactivated ${selectedEmployees.length} employees`,
+        });
+        mutate(
+          `/api/company-admin/employees?companyId=${companyId}&search=${searchQuery}&role=${filterRole}&status=${filterStatus}`,
+        );
+      } else if (action === 'send-email') {
+        toast({
+          title: 'Emails Sent',
+          description: `Sent emails to ${selectedEmployees.length} employees`,
+        });
+      }
+
       setSelectedEmployees([]);
     } catch (error) {
       toast({
