@@ -55,7 +55,12 @@ export interface User {
   displayName: string;
   photoURL?: string;
   phoneNumber?: string;
-  role: 'super-admin' | 'platform-admin' | 'company-admin' | 'hr-admin' | 'employee';
+  role:
+    | 'super-admin'
+    | 'platform-admin'
+    | 'company-admin'
+    | 'hr-admin'
+    | 'employee';
   companyId?: string;
   department?: string;
   jobTitle?: string;
@@ -111,7 +116,16 @@ export interface BenefitPlan {
   id: string;
   companyId: string;
   name: string;
-  type: 'health' | 'dental' | 'vision' | '401k' | 'life' | 'disability' | 'fsa' | 'hsa' | 'other';
+  type:
+    | 'health'
+    | 'dental'
+    | 'vision'
+    | '401k'
+    | 'life'
+    | 'disability'
+    | 'fsa'
+    | 'hsa'
+    | 'other';
   provider: string;
   planCode?: string;
   description: string;
@@ -126,8 +140,11 @@ export interface BenefitPlan {
     deductible?: number;
     outOfPocketMax?: number;
     copay?: Record<string, number>;
-    coinsurance?: number;
-    employerContribution?: number;
+    coinsurance?: Record<string, number>;
+    contributionAmounts?: {
+      employee: number;
+      employer?: number;
+    };
   };
   features: string[];
   eligibility: {
@@ -283,7 +300,12 @@ export interface Enrollment {
     startDate: Timestamp;
     endDate: Timestamp;
   };
-  status: 'not-started' | 'in-progress' | 'pending-review' | 'completed' | 'cancelled';
+  status:
+    | 'not-started'
+    | 'in-progress'
+    | 'pending-review'
+    | 'completed'
+    | 'cancelled';
   selections: Array<{
     planId: string;
     planType: string;

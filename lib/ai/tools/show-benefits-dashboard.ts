@@ -19,9 +19,9 @@ export const showBenefitsDashboard = tool({
             totalEnrollments: 0,
             totalMonthlyCost: 0,
             totalEmployeeContribution: 0,
-            totalEmployerContribution: 0
+            totalEmployerContribution: 0,
           },
-          upcomingDeadlines: []
+          upcomingDeadlines: [],
         };
       }
 
@@ -34,39 +34,71 @@ export const showBenefitsDashboard = tool({
             totalEnrollments: 0,
             totalMonthlyCost: 0,
             totalEmployeeContribution: 0,
-            totalEmployerContribution: 0
+            totalEmployerContribution: 0,
           },
-          upcomingDeadlines: []
+          upcomingDeadlines: [],
         };
       }
-      
+
       // Get user's actual enrollments with tenant filtering
-      const userEnrollments = await benefitService.getBenefitEnrollments(user.uid);
+      const userEnrollments = await benefitService.getBenefitEnrollments(
+        user.uid,
+      );
+
+      const plans = await benefitService.getBenefitPlans();
+      const planMap = new Map(plans.map((p: any) => [p.id, p]));
 
       // Transform enrollments for dashboard display
-      const enrollments = userEnrollments.map(enrollment => ({
-        id: enrollment.id,
-        planName: 'Unknown Plan', // TODO: Get plan name
-        type: 'unknown', // TODO: Get plan type
-        category: 'N/A', // TODO: Get plan category
-        provider: 'N/A', // TODO: Get plan provider
-        monthlyPremium: enrollment.monthlyCost,
-        employeeContribution: 0, // TODO: Calculate employee contribution
-        employerContribution: 0, // TODO: Calculate employer contribution
-        deductible: 0, // TODO: Get plan deductible
-        outOfPocketMax: 0, // TODO: Get plan out of pocket max
-        coverageType: enrollment.coverageType,
-        effectiveDate: enrollment.electedOn,
-        endDate: null, // TODO: Get end date
-        status: enrollment.status
-      }));
+      const enrollments = userEnrollments.map((enrollment) => {
+        const plan: any = planMap.get(enrollment.benefitPlanId) || {};
+        const monthlyPremium =
+          plan.contributionAmounts?.employee ?? enrollment.monthlyCost;
+        const employeeContribution = plan.contributionAmounts?.employee ?? 0;
+        const employerContribution = plan.contributionAmounts?.employer ?? 0;
+        const deductible = plan
+          ? enrollment.coverageType === 'family'
+            ? plan.deductibleFamily || 0
+            : plan.deductibleIndividual || 0
+          : 0;
+        const outOfPocketMax = plan
+          ? enrollment.coverageType === 'family'
+            ? plan.outOfPocketMaxFamily || 0
+            : plan.outOfPocketMaxIndividual || 0
+          : 0;
+
+        return {
+          id: enrollment.id,
+          planName: plan.name || 'Unknown Plan',
+          type: plan.type || 'unknown',
+          category: plan.category || 'N/A',
+          provider: plan.provider || 'N/A',
+          monthlyPremium,
+          employeeContribution,
+          employerContribution,
+          deductible,
+          outOfPocketMax,
+          coverageType: enrollment.coverageType,
+          effectiveDate: enrollment.electedOn,
+          endDate: null,
+          status: enrollment.status,
+        };
+      });
 
       // Calculate summary
       const summary = {
         totalEnrollments: enrollments.length,
-        totalMonthlyCost: enrollments.reduce((sum, e) => sum + e.monthlyPremium, 0),
-        totalEmployeeContribution: enrollments.reduce((sum, e) => sum + e.employeeContribution, 0),
-        totalEmployerContribution: enrollments.reduce((sum, e) => sum + e.employerContribution, 0)
+        totalMonthlyCost: enrollments.reduce(
+          (sum, e) => sum + e.monthlyPremium,
+          0,
+        ),
+        totalEmployeeContribution: enrollments.reduce(
+          (sum, e) => sum + e.employeeContribution,
+          0,
+        ),
+        totalEmployerContribution: enrollments.reduce(
+          (sum, e) => sum + e.employerContribution,
+          0,
+        ),
       };
 
       // Calculate upcoming deadlines based on current date
@@ -78,10 +110,13 @@ export const showBenefitsDashboard = tool({
       const openEnrollmentDate = new Date(currentYear, 10, 1); // November 1
       if (openEnrollmentDate > currentDate) {
         upcomingDeadlines.push({
-          event: "Open Enrollment",
+          event: 'Open Enrollment',
           date: openEnrollmentDate.toISOString().split('T')[0],
-          description: "Annual benefits enrollment period begins",
-          daysUntil: Math.ceil((openEnrollmentDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24))
+          description: 'Annual benefits enrollment period begins',
+          daysUntil: Math.ceil(
+            (openEnrollmentDate.getTime() - currentDate.getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
         });
       }
 
@@ -89,10 +124,13 @@ export const showBenefitsDashboard = tool({
       const fsaDeadline = new Date(currentYear, 11, 31); // December 31
       if (fsaDeadline > currentDate) {
         upcomingDeadlines.push({
-          event: "FSA Deadline",
+          event: 'FSA Deadline',
           date: fsaDeadline.toISOString().split('T')[0],
-          description: "Use remaining FSA funds before year-end",
-          daysUntil: Math.ceil((fsaDeadline.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24))
+          description: 'Use remaining FSA funds before year-end',
+          daysUntil: Math.ceil(
+            (fsaDeadline.getTime() - currentDate.getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
         });
       }
 
@@ -103,27 +141,27 @@ export const showBenefitsDashboard = tool({
         user: {
           id: user.uid,
           name: user.displayName || 'User',
-          email: user.email || 'No email'
+          email: user.email || 'No email',
         },
         enrollments,
         summary,
-        upcomingDeadlines
+        upcomingDeadlines,
       };
-
     } catch (error) {
       console.error('Error in showBenefitsDashboard tool:', error);
       return {
-        error: 'Unable to retrieve benefits dashboard data. Please try again later.',
+        error:
+          'Unable to retrieve benefits dashboard data. Please try again later.',
         user: null,
         enrollments: [],
         summary: {
           totalEnrollments: 0,
           totalMonthlyCost: 0,
           totalEmployeeContribution: 0,
-          totalEmployerContribution: 0
+          totalEmployerContribution: 0,
         },
-        upcomingDeadlines: []
+        upcomingDeadlines: [],
       };
     }
-  }
+  },
 });

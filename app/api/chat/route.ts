@@ -5,6 +5,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { CHAT_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { ragSystem } from '@/lib/ai/rag-system';
+import logger from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { messages, chatId: existingChatId } = await request.json();
+    logger.info('Chat request received', { userId, companyId });
 
     // Determine the chat ID
     const chatId =
@@ -48,13 +50,15 @@ export async function POST(request: NextRequest) {
       .map((result) => result.chunk.content)
       .join('\n\n');
     if (searchResults.length > 0) {
-      console.log(
-        'RAG search results:',
-        searchResults.map((r) => ({
+      logger.info('RAG search results', {
+        userId,
+        companyId,
+        chatId,
+        results: searchResults.map((r) => ({
           chunkId: r.chunk.id,
           score: r.score,
         })),
-      );
+      });
     }
     const systemPrompt = searchResults.length
       ? `${CHAT_SYSTEM_PROMPT}\n\nRetrieved context:\n${context}`
@@ -96,7 +100,9 @@ export async function POST(request: NextRequest) {
 
     return result.toDataStreamResponse();
   } catch (error) {
-    console.error('Chat API error:', error);
+    logger.error('Chat API error', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
