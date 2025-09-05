@@ -2,6 +2,12 @@ import { google } from 'googleapis';
 import type { OAuth2Client } from 'google-auth-library';
 import { db } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import type { Credentials } from 'google-auth-library';
+import {
+  saveOAuthTokens,
+  getValidAccessToken,
+  deleteOAuthTokens,
+} from '@/lib/services/oauth-token.service';
 
 export interface GoogleWorkspaceUser {
   id: string;
@@ -55,8 +61,13 @@ class GoogleWorkspaceService {
   /**
    * Sync users from Google Workspace to Firestore
    */
-  async syncUsers(companyId: string, accessToken: string): Promise<number> {
+  async syncUsers(companyId: string): Promise<number> {
     try {
+      const accessToken = await getValidAccessToken(companyId);
+      if (!accessToken) {
+        throw new Error('Missing Google Workspace tokens');
+      }
+
       this.oauth2Client.setCredentials({ access_token: accessToken });
 
       const admin = google.admin({
@@ -189,18 +200,17 @@ class GoogleWorkspaceService {
    */
   async enableIntegration(
     companyId: string,
-    accessToken: string,
-    refreshToken?: string,
+    tokens: Credentials,
   ): Promise<boolean> {
     try {
+      await saveOAuthTokens(companyId, tokens);
+
       await db
         .collection('companies')
         .doc(companyId)
         .update({
           'integrations.googleWorkspace': {
             enabled: true,
-            accessToken,
-            refreshToken,
             enabledAt: FieldValue.serverTimestamp(),
           },
           updatedAt: FieldValue.serverTimestamp(),
@@ -218,6 +228,7 @@ class GoogleWorkspaceService {
    */
   async disableIntegration(companyId: string): Promise<boolean> {
     try {
+      await deleteOAuthTokens(companyId);
       await db
         .collection('companies')
         .doc(companyId)
