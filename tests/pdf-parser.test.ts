@@ -10,7 +10,7 @@ async function createSamplePdf(text: string) {
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4AWP4DwQACfsD/c8LaHIAAAAASUVORK5CYII=',
     'base64',
   );
-  const image = await pdfDoc.embedPng(Uint8Array.from(imgBytes));
+  const image = await pdfDoc.embedPng(new Uint8Array(imgBytes));
   page.drawImage(image, { x: 50, y: 50, width: 20, height: 20 });
   return pdfDoc.save();
 }
