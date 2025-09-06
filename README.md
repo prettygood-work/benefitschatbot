@@ -1,340 +1,240 @@
 # Benefits Assistant Chatbot v2.0
 
-A multi-tenant, AI-powered benefits management platform that transforms employee benefits decisions through conversational AI, visual analytics, and intelligent automation.
-
-## 🚀 Current Status
-
-**Version**: MVP (Single-tenant)  
-**Stack**: Next.js 15, TypeScript, Drizzle ORM, Neon PostgreSQL, Vercel AI SDK  
-**Deployment**: Vercel (Production)  
-**AI Model**: xAI Grok-2 (with OpenAI GPT-4 fallback ready)
-
-### ✅ Completed Features
-- Basic conversational AI with benefits personality
-- Visual components:
-  - Plan comparison cards
-  - Benefits dashboard
-  - Interactive cost calculator
-- AI tools (currently using mock data):
-  - `comparePlans`
-  - `calculateBenefitsCost`
-  - `showBenefitsDashboard`
-  - `showCostCalculator`
-- Basic authentication (NextAuth)
-- Chat history persistence
-- Responsive design
-
-### 🚧 In Development
-- Multi-tenant database schema
-- Real data integration
-- Document processing
-- Knowledge base
-- Admin portals (Employer & Provider)
-- SSO integration
-- Analytics engine
-
-## 📚 Documentation
-
-### Core Documents
-- **[Technical Specification v2.0](./docs/tech-spec-v2.md)** - Complete technical architecture
-- **[Product Requirements Document](./docs/prd-v2.md)** - Business requirements and success metrics
-- **[System Architecture](./docs/architecture-v2.md)** - Detailed system design with Tree-of-Thought analysis
-- **[Product Blueprint](./docs/blueprint-v2.md)** - Vision, personas, and non-functional requirements
-- **[Style Guide](./docs/style-guide-v2.md)** - Design system and UI standards
-- **[Development Roadmap](./docs/roadmap-v2.md)** - 18-week phased implementation plan
-- **[Claude Code Execution System](./docs/claude-code-execution-system.md)** - Step-by-step implementation guide
-- **[Development Control System](./claude.md)** - Real-time development tracking and verification
-
-## 🏗️ Architecture Overview
-
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Web Client    │     │  Mobile Client  │     │   API Client    │
-└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
-         │                       │                         │
-         └───────────────────────┴─────────────────────────┘
-                                 │
-                    ┌────────────▼────────────┐
-                    │    Vercel Edge/CDN      │
-                    │  (Auth, Rate Limiting)  │
-                    └────────────┬────────────┘
-                                 │
-         ┌───────────────────────┴───────────────────────┐
-         │                                               │
-    ┌────▼─────┐  ┌──────────────┐  ┌─────────────┐  ┌─▼──────────┐
-    │   Chat   │  │   Benefits   │  │  Analytics  │  │   Admin    │
-    │  Service │  │   Service    │  │   Service   │  │  Service   │
-    └────┬─────┘  └──────┬───────┘  └──────┬──────┘  └─────┬──────┘
-         │               │                   │                │
-         └───────────────┴───────────────────┴────────────────┘
-                                 │
-                    ┌────────────▼────────────┐
-                    │    AI Orchestration     │
-                    │  (Multi-Model Routing)  │
-                    └────────────┬────────────┘
-                                 │
-         ┌───────────────────────┴───────────────────────┐
-         │                       │                       │
-    ┌────▼─────┐         ┌──────▼───────┐      ┌───────▼──────┐
-    │PostgreSQL│         │   Pinecone    │      │    Redis     │
-    │  (Neon)  │         │ (Vector DB)   │      │   (Cache)    │
-    └──────────┘         └──────────────┘      └──────────────┘
-```
-
-## 🚦 Quick Start
-
-### Prerequisites
-- Node.js >= 20.0.0
-- pnpm >= 8.0.0
-- PostgreSQL (via Neon)
-- Vercel CLI (for deployment)
-
-### Environment Setup
-```bash
-# Clone repository
-git clone https://github.com/your-org/benefits-chatbot.git
-cd benefits-chatbot
-
-# Install dependencies
-pnpm install
-
-# Copy environment variables
-cp .env.example .env.local
-
-# Required environment variables:
-POSTGRES_URL=              # Neon PostgreSQL URL
-POSTGRES_URL_NON_POOLING=  # Neon direct connection
-AUTH_SECRET=               # NextAuth secret (generate with: openssl rand -base64 32)
-OPENAI_API_KEY=            # For GPT-4 fallback
-XAI_API_KEY=               # For Grok-2 (primary)
-```
-
-#### Google Cloud Setup
-
-To use Vertex AI and Document AI features:
-
-1. Enable the Vertex AI and Document AI APIs in your Google Cloud project.
-2. Create a Vertex AI index and endpoint, and note their IDs.
-3. Create a Document AI processor for the documents you need to process.
-4. Grant your service account the following IAM roles:
-   - Vertex AI User (`roles/aiplatform.user`)
-   - Document AI Editor (`roles/documentai.editor`)
-5. Add the following variables to your `.env.local` file:
-   - `GOOGLE_CLOUD_PROJECT`
-   - `GOOGLE_CLOUD_LOCATION`
-   - `VERTEX_INDEX_ID`
-   - `VERTEX_ENDPOINT_ID`
-   - `DOCUMENT_AI_PROCESSOR_ID`
-
-### Development
-```bash
-# Run database migrations
-pnpm db:migrate
-
-# Start development server
-pnpm dev
-
-# Run tests
-pnpm test
-
-# Check types
-pnpm tsc --noEmit
-
-# Lint and format
-pnpm lint:fix
-pnpm format
-```
-
-### Database Management
-```bash
-# Generate migration
-pnpm db:generate
-
-# Run migrations
-pnpm db:migrate
-
-# Open Drizzle Studio
-pnpm db:studio
-
-# Push schema changes (dev only)
-pnpm db:push
-```
-
-## 🧪 Testing Strategy
-
-### Unit Tests
-```bash
-pnpm test:unit          # Run unit tests
-pnpm test:unit:watch    # Watch mode
-pnpm test:unit:coverage # With coverage
-```
-
-### Integration Tests
-```bash
-pnpm test:integration   # Run integration tests
-pnpm test:e2e           # Run E2E tests with Playwright
-```
-
-### Verification Suite
-```bash
-# Run complete verification before committing
-./scripts/verify.sh
-
-# This runs:
-# - Type checking
-# - Linting
-# - Tests
-# - Build verification
-# - Security audit
-```
-
-## 🚀 Deployment
-
-### Vercel Deployment (Production)
-```bash
-# Deploy to production
-vercel --prod
-
-# Deploy to preview
-vercel
-
-# Check deployment status
-vercel ls
-```
-
-### Environment Configuration
-- **Development**: Local PostgreSQL, development API keys
-- **Staging**: Neon PostgreSQL (staging), test API keys
-- **Production**: Neon PostgreSQL (production), production API keys
-
-## 📁 Project Structure
-
-```
-benefits-chatbot/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── (chat)/            # Chat interface
-│   ├── api/               # API routes
-│   └── provider/          # Provider admin portal
-├── components/            # React components
-│   ├── custom/            # Business-specific components
-│   └── ui/                # shadcn/ui components
-├── lib/                   # Core business logic
-│   ├── ai/                # AI tools and prompts
-│   │   ├── tools/         # AI function tools
-│   │   ├── prompts/       # System prompts
-│   │   └── context/       # Context management
-│   ├── db/                # Database layer
-│   │   ├── schema/        # Drizzle schemas
-│   │   ├── repositories/  # Data access layer
-│   │   └── migrations/    # SQL migrations
-│   └── utils/             # Utility functions
-├── public/                # Static assets
-├── scripts/               # Build and maintenance scripts
-├── tests/                 # Test files
-├── docs/                  # Documentation
-└── claude.md              # Development tracking
-```
-
-## 🔐 Security
-
-### Authentication & Authorization
-- **Provider Admin**: Full platform access
-- **Employer Admin**: Company-specific access
-- **Employee**: Personal benefits access only
-
-### Data Protection
-- End-to-end encryption (TLS 1.3)
-- Row-level security in PostgreSQL
-- Encrypted environment variables
-- No PII/PHI storage in logs
-
-### Compliance
-- GDPR-ready data handling
-- CCPA compliance features
-- SOC 2 Type II practices
-- HIPAA-ready architecture
-
-## 🤝 Contributing
-
-### Development Workflow
-1. Review [claude.md](./claude.md) for current status
-2. Pick a task from the roadmap
-3. Create a feature branch
-4. Implement with proof-of-work
-5. Update claude.md with evidence
-6. Submit PR with verification
-
-### Code Standards
-- TypeScript strict mode
-- No `any` without TODO
-- 80%+ test coverage
-- All PRs must pass CI
-
-### Using with Windsurf/Cascade
-When using AI coding assistants:
-1. Always provide full context from claude.md
-2. Verify generated code against our patterns
-3. Run verification suite before committing
-4. Document any deviations in claude.md
-
-## 📊 Monitoring & Analytics
-
-### Production Monitoring
-- **Vercel Analytics**: Page views, Web Vitals
-- **Error Tracking**: Sentry (to be configured)
-- **AI Metrics**: Token usage, response times
-- **Business Metrics**: Custom analytics dashboard
-
-### Health Checks
-- `/api/health` - System health
-- `/api/health/db` - Database connectivity
-- `/api/health/ai` - AI service availability
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-#### Database Connection Errors
-```bash
-# Check connection
-pnpm exec tsx scripts/check-db.ts
-
-# Reset connection pool
-pnpm db:push --force
-```
-
-#### Build Failures
-```bash
-# Clear cache
-rm -rf .next
-pnpm install --force
-pnpm build
-```
-
-#### Type Errors
-```bash
-# Regenerate types
-pnpm db:generate
-pnpm tsc --noEmit
-```
-
-## 📞 Support
-
-### Development Team
-- **Technical Issues**: Create GitHub issue
-- **Security Concerns**: security@company.com
-- **Business Questions**: product@company.com
-
-### Resources
-- [Internal Wiki](./docs/wiki)
-- [API Documentation](./docs/api)
-- [Deployment Guide](./docs/deployment)
-
-## 📄 License
-
-Proprietary - All rights reserved
+# Benefits Assistant Chatbot  
+Multi‑tenant AI platform empowering employees to understand, compare, and manage workplace benefits through natural conversation, intuitive visuals, and smart automation.
 
 ---
 
-**Note**: This is an active development project. Always check [claude.md](./claude.md) for the latest development status and [roadmap-v2.md](./docs/roadmap-v2.md) for upcoming features.
+## 🗂️ Project Snapshot
+| Item | Status |
+|-----|--------|
+| **Current Version** | 3.1.0 |
+| **Deployment Target** | Firebase / Google Cloud |
+| **Primary Model** | Vertex AI (OpenAI & Anthropic as fallback) |
+| **Database Migration** | PostgreSQL ➜ Firebase |
+
+---
+
+## ✅ Delivered Capability
+- Conversational benefits assistant with friendly personality  
+- Visual decision aids  
+  - Plan comparison cards  
+  - Benefits dashboard  
+  - Interactive cost calculator  
+- AI tools using mock data  
+  - `comparePlans`, `calculateBenefitsCost`, `showBenefitsDashboard`, `showCostCalculator`  
+- Basic authentication (NextAuth)  
+- Chat history persistence  
+- Responsive design  
+
+---
+
+## 🚧 What’s Under Construction
+| Workstream | Description |
+|------------|-------------|
+| **Multi‑tenant schema** | Segment data for employers, providers, and employees |
+| **Real data integration** | Replace mock data with live benefits plans |
+| **Document processing** | Ingest and parse plan PDFs, DOCX, and images |
+| **Knowledge base** | Centralized reference library for AI context |
+| **Admin portals** | Employer & provider control panels |
+| **SSO integration** | OAuth2/SAML for enterprise logins |
+| **Analytics engine** | Usage metrics and benefits insights |
+| **Monitoring & alerts** | Sentry, logging, and automated health checks |
+| **Compliance hardening** | SOC 2, HIPAA alignment, audit tooling |
+
+---
+
+## 🛠️ Technology Stack
+### Frontend
+- Next.js 15 • TypeScript • Tailwind CSS  
+- shadcn/ui • SWR • React 19  
+
+### Backend & Cloud
+- Firebase Auth • Firestore • Cloud Storage  
+- Cloud Functions • Vertex AI & Vector Search  
+- Resend (email) • Caching layer  
+
+### Development
+- pnpm • Biome (lint/format)  
+- Vitest & React Testing Library  
+- Playwright (E2E) • Firebase CLI  
+
+---
+
+## 🏗️ System Architecture
+┌───────────────────────────── Clients ─────────────────────────────┐
+│ Web App │ Mobile App │ API Consumers │
+└──────┬────┴───────┬──────┴───────┬────────────────────────────────┘
+│ │ │
+└────────────┴──────────────┴──────────────┐
+▼
+Firebase Hosting / CDN
+(Routing + Auth)
+│
+┌──────────────────────────┬──────────────────────────┐
+│ │ │
+Chat Function Benefits Function Admin Function
+└──────────┬───────────────┴───────────────┬──────────┘
+│ │
+▼ ▼
+AI Orchestration (Vertex AI)
+│
+┌──────────────┬──────────────┬──────────────┐
+│ Firestore DB │ Cloud Funcs │ Vertex Vector │
+│ │ │ Search │
+└──────────────┴──────────────┴──────────────┘
+
+yaml
+Copy code
+
+---
+
+## 🚀 Quick Start for Developers
+```bash
+# 1. Clone the repo
+git clone https://github.com/your-org/benefits-chatbot.git
+cd benefitschatbot
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Configure environment
+cp .env.example .env.local
+# Fill in required keys before proceeding
+
+# 4. Validate configuration
+pnpm run validate-env
+
+# 5. Start development server
+pnpm run dev
+Essential Environment Variables
+NEXT_PUBLIC_FIREBASE_API_KEY, NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, …
+
+FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+
+RESEND_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY (or equivalent)
+See .env.example for the full list.
+
+Google Cloud Setup
+Enable Firestore, Vertex AI, and Document AI APIs
+
+Create Vertex AI index & endpoint, plus Document AI processor
+
+Grant service account roles:
+
+roles/aiplatform.user
+
+roles/documentai.editor
+
+Add to .env.local:
+
+GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION
+
+VERTEX_AI_PROJECT_ID, VERTEX_AI_LOCATION
+
+VERTEX_AI_INDEX_ID, VERTEX_AI_INDEX_ENDPOINT_ID
+
+DOCUMENT_AI_PROCESSOR_ID
+
+🧪 Testing & Verification
+Command	Purpose
+pnpm test	Run unit tests with coverage
+pnpm test:integration	Integration suite
+pnpm test:e2e	Playwright end‑to‑end tests
+pnpm typecheck	TypeScript checking
+pnpm lint	Biome + ESLint
+pnpm run build	Production build validation
+./scripts/verify.sh	Full pre‑commit verification (typecheck, lint, test, build, security)
+
+📁 Key Directories
+vbnet
+Copy code
+app/           → Next.js App Router pages & APIs
+components/    → Reusable UI pieces
+lib/           → AI tools, DB layer, utilities
+public/        → Static assets
+scripts/       → Maintenance & deploy scripts
+tests/         → Unit / integration / E2E tests
+docs/          → Specs & audit reports
+🔐 Security & Compliance
+Authentication
+
+Provider Admin: full platform management
+
+Employer Admin: organization-specific control
+
+Employee: personal benefits access only
+
+Data Protection
+
+TLS 1.3 for all traffic
+
+Encrypted environment variables
+
+No PII/PHI stored in logs
+
+Compliance Alignment
+
+GDPR & CCPA-ready practices
+
+SOC 2 Type II procedures
+
+HIPAA-ready architecture
+
+🤝 Contributing Guidelines
+Review open tasks and pick an issue
+
+Create a feature branch
+
+Implement with tests and proof‑of‑work
+
+Run the full verification suite
+
+Submit a pull request with context
+
+Coding Standards
+
+TypeScript strict mode
+
+No any unless TODO with follow‑up issue
+
+≥80 % coverage (lines, statements, functions; ≥15 % branches)
+
+CI must pass before merge
+
+Using AI Assistants
+
+Provide full context in prompts
+
+Validate generated code against existing patterns
+
+Document deviations in the PR description
+
+📊 Monitoring & Health
+Error Tracking: Sentry (pending configuration)
+
+AI Metrics: token counts, latency
+
+Business Metrics: custom analytics dashboard
+
+Health endpoints:
+
+/api/health – system uptime
+
+/api/health/db – database connectivity
+
+/api/health/ai – model availability
+
+🆘 Support & Contact
+Technical issues: open a GitHub issue
+
+Security concerns: security@company.com
+
+Business inquiries: product@company.com
+
+Resources: see docs/ for internal guides, API contracts, and deployment notes.
+
+📄 License
+Proprietary – All rights reserved
+
+This project is under active development. Feedback and collaboration are welcome.

@@ -1,25 +1,28 @@
 // app/api/auth/google/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
-import { google } from 'googleapis';
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
+import { googleWorkspaceService } from '@/lib/services/google-workspace.service';
 
 export async function GET(request: NextRequest) {
-  const url = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/admin.directory.user.readonly'],
-  });
+  const { searchParams } = new URL(request.url);
+  const tenantId = searchParams.get('tenantId') || undefined;
+  const url = googleWorkspaceService.getAuthorizationUrl(tenantId);
   return NextResponse.redirect(url);
 }
 
 export async function POST(request: NextRequest) {
-  const { code } = await request.json();
-  const { tokens } = await oauth2Client.getToken(code);
-  oauth2Client.setCredentials(tokens);
-  // TODO: Save the tokens to the database
-  return NextResponse.json({ success: true });
+  try {
+    const { code, tenantId } = await request.json();
+    if (!code || !tenantId) {
+      return NextResponse.json(
+        { error: 'Missing code or tenantId' },
+        { status: 400 },
+      );
+    }
+    const tokens = await googleWorkspaceService.getTokens(code);
+    await googleWorkspaceService.enableIntegration(tenantId, tokens);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Google OAuth error:', error);
+    return NextResponse.json({ error: 'OAuth failed' }, { status: 500 });
+  }
 }

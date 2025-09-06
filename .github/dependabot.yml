@@ -1,0 +1,109 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+# Dependabot v2 configuration
+# Notes:
+# - For pnpm, Dependabot uses the "npm" ecosystem and understands pnpm-lock.yaml.
+# - If you have multiple package.json workspaces, add more "npm" entries with the appropriate "directory".
+# - Grouping helps reduce PR noise and makes upgrades easier to review/merge.
+# - Reviewers can be adjusted to a team slug (e.g., prettygood-work/maintainers) if preferred.
+
+version: 2
+updates:
+  # JavaScript/TypeScript dependencies (npm/yarn/pnpm)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "UTC"
+    # For app repos, increasing allowed versions is typically appropriate.
+    versioning-strategy: increase
+    open-pull-requests-limit: 15
+    labels:
+      - "dependencies"
+      - "automerge:eligible"
+    # Optional: auto-assign a reviewer; adjust as needed.
+    reviewers:
+      - "spencerprettygood"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Grouping rules to keep noise down and make review easier.
+    groups:
+      npm-minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      npm-major:
+        applies-to: version-updates
+        update-types:
+          - "major"
+      tooling-dev-dependencies:
+        # Gather common dev tooling for a single PR to simplify updates.
+        dependency-type: "development"
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "@types/*"
+          - "typescript"
+          - "jest*"
+          - "vitest*"
+          - "ts-jest*"
+          - "babel*"
+          - "vite*"
+          - "webpack*"
+
+  # Keep GitHub Actions up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:30"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "ci"
+      - "dependencies"
+      - "automerge:eligible"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    groups:
+      gha-weekly:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker base images (if you have Dockerfiles in the root)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "docker"
+      - "dependencies"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # If you pin base images to digests, dependabot will PR digest bumps.
+    # Add more entries for other Dockerfile directories as needed.
+
+# If you have additional package roots (packages/*, apps/*, etc.), duplicate the npm entry
+# and change the "directory" to each workspace path.
