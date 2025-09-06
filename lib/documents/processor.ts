@@ -1,9 +1,6 @@
-import { extractText } from 'unpdf';
 import { adminDb, FieldValue as AdminFieldValue } from '@/lib/firebase/admin';
-import { vectorSearchService, upsertDocumentChunks } from '@/lib/ai/vector-search';
-import { generateEmbeddings } from '@/lib/ai/embeddings';
-import { notificationService } from '@/lib/services/notification.service';
-
+import { upsertDocumentChunks } from '@/lib/ai/vector-search';
+import { parsePdf, chunkText, chunkPdf } from '@/lib/documents/pdf-parser';
 
 /**
  * Process a document: extract text, chunk it, generate embeddings, and store in Vertex AI Vector Search
@@ -32,14 +29,25 @@ export async function processDocument(documentId: string) {
 
     const fileBuffer = await response.arrayBuffer();
 
-    // Extract text based on file type
+    // Extract content based on file type
     let extractedText = '';
+    let parsedChunks:
+      | { text: string; pageNumber: number; images: string[] }[]
+      | undefined;
 
     if (document.fileType === 'application/pdf') {
-      const { text } = await extractText(fileBuffer);
-      extractedText = Array.isArray(text) ? text.join('\n') : text;
+      const parsed = await parsePdf(fileBuffer);
+      extractedText = parsed.text;
+      parsedChunks = chunkPdf(parsed, {
+        maxChunkSize: 1000,
+        overlapSize: 200,
+      });
     } else if (document.fileType === 'text/plain') {
       extractedText = new TextDecoder().decode(fileBuffer);
+      parsedChunks = chunkText(extractedText, {
+        maxChunkSize: 1000,
+        overlapSize: 200,
+      }).map((text, i) => ({ text, pageNumber: i + 1, images: [] }));
     } else {
       // For now, we'll skip other file types
       throw new Error(`Unsupported file type: ${document.fileType}`);
@@ -56,28 +64,23 @@ export async function processDocument(documentId: string) {
       status: 'processing',
     });
 
-    // Chunk the text
-    const chunks = chunkText(extractedText, {
-      maxChunkSize: 1000,
-      overlapSize: 200,
-    });
-
-    const embeddings = await generateEmbeddings(chunks);
-    const documentChunks = chunks.map((chunk, i) => ({
+    const documentChunks = parsedChunks.map((chunk, i) => ({
       id: `${documentId}-chunk-${i}`,
-      text: chunk,
-      embedding: embeddings[i],
+      text: chunk.text,
       metadata: {
         documentId,
         companyId: document.companyId,
         documentTitle: document.title,
         chunkIndex: i,
+        pageNumber: chunk.pageNumber,
         category: document.category || undefined,
         tags: (document.tags as string[]) || [],
       },
     }));
 
     // Store in Vertex AI
+    const { status: upsertStatus, vectorsUpserted } =
+      await upsertDocumentChunks(document.companyId, documentChunks);
 
     const { status: upsertStatus, vectorsUpserted } = await upsertDocumentChunks(
       document.companyId,
@@ -93,7 +96,7 @@ export async function processDocument(documentId: string) {
     await adminDb.collection('documents').doc(documentId).update({
       status: 'processed',
       processedAt: AdminFieldValue.serverTimestamp(),
-      chunksCount: chunks.length,
+      chunksCount: parsedChunks.length,
     });
 
     // Send success notification if the document has an associated user
@@ -107,7 +110,7 @@ export async function processDocument(documentId: string) {
 
     return {
       success: upsertStatus === 'success',
-      chunksProcessed: chunks.length,
+      chunksProcessed: parsedChunks.length,
       vectorsStored: vectorsUpserted,
     };
   } catch (error) {
@@ -143,60 +146,6 @@ export async function processDocument(documentId: string) {
 
     throw error;
   }
-}
-
-/**
- * Chunk text into smaller pieces with overlap
- */
-export function chunkText(
-  text: string,
-  options: {
-    maxChunkSize: number;
-    overlapSize: number;
-  },
-): string[] {
-  const { maxChunkSize, overlapSize } = options;
-  const chunks: string[] = [];
-
-  // Clean up the text
-  const cleanText = text
-    .replace(/\n\s*\n/g, '\n\n') // Normalize multiple newlines
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim();
-
-  // Split into sentences (simple approach)
-  const sentences = cleanText.split(/(?<=[.!?])\s+/);
-
-  let currentChunk = '';
-  let currentSize = 0;
-
-  for (const sentence of sentences) {
-    const sentenceSize = sentence.length;
-
-    if (currentSize + sentenceSize > maxChunkSize && currentChunk) {
-      // Save current chunk
-      chunks.push(currentChunk.trim());
-
-      // Start new chunk with overlap
-      const overlap = currentChunk
-        .split(' ')
-        .slice(-Math.floor(overlapSize / 10)) // Approximate word count for overlap
-        .join(' ');
-
-      currentChunk = `${overlap} ${sentence}`;
-      currentSize = currentChunk.length;
-    } else {
-      currentChunk += (currentChunk ? ' ' : '') + sentence;
-      currentSize += sentenceSize;
-    }
-  }
-
-  // Don't forget the last chunk
-  if (currentChunk.trim()) {
-    chunks.push(currentChunk.trim());
-  }
-
-  return chunks;
 }
 
 /**
